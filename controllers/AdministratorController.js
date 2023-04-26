@@ -58,7 +58,7 @@ const loginAdmin = async (req, res) => {
             });
         
             if (match) {
-                res.status(200).send({message: admin_arr[0], token: jwt.createToken(register)});
+                res.status(200).send({message: admin_arr[0], token: jwt.createToken(admin_arr[0])});
             } else {
                 res.status(400).send({message: "The password is incorrect"});
             }

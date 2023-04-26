@@ -2,6 +2,7 @@
 
 const Customer = require('../models/Customer');
 const bcrypt = require('bcrypt-nodejs');
+const jwt = require('../helpers/jwt');
 
 const createCustomer = async (req, res) => {
     // data from the request
