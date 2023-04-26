@@ -1,0 +1,24 @@
+# Archivos de registro
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Directorio de dependencias
+node_modules
+
+# Directorios de compilación
+dist
+build
+
+# Archivos de entorno
+.env
+.env.local
+.env.*.local
+
+# Archivos temporales
+.DS_Store
+.tmp
+.nyc_output
