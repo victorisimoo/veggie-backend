@@ -10,6 +10,7 @@ exports.createToken = (user) => {
         name: user.name,
         lastname: user.lastname,
         email: user.email,
+        rol: user.rol,
         iat: moment().unix(),
         exp: moment().add(15, 'days').unix()
     };

@@ -68,7 +68,28 @@ const loginCustomer = async (req, res) => {
     }
 }
 
+const getAllCustomers = async (req, res) => {
+    
+    var type = req.params['type'];
+    var filter = req.params['filter'];
+
+    if(type != 'name' && type != 'email'){
+        var customers = await Customer.find();
+        res.status(200).send({data: customers});
+    }else {
+        if(type == 'name'){
+            let regx = await Customer.find({name: new RegExp(filter, 'i')});
+            res.status(200).send({data: regx});
+        }else if (type == 'email'){
+            let regx = await Customer.find({email: new RegExp(filter, 'i')});
+            res.status(200).send({data: regx});
+        }
+    }   
+}
+
+
 module.exports = {
     createCustomer, 
-    loginCustomer
+    loginCustomer, 
+    getAllCustomers
 }
