@@ -69,27 +69,141 @@ const loginCustomer = async (req, res) => {
 }
 
 const getAllCustomers = async (req, res) => {
-    
-    var type = req.params['type'];
-    var filter = req.params['filter'];
-
-    if(type != 'name' && type != 'email'){
-        var customers = await Customer.find();
-        res.status(200).send({data: customers});
-    }else {
-        if(type == 'name'){
-            let regx = await Customer.find({name: new RegExp(filter, 'i')});
-            res.status(200).send({data: regx});
-        }else if (type == 'email'){
-            let regx = await Customer.find({email: new RegExp(filter, 'i')});
-            res.status(200).send({data: regx});
+    if(req.user){
+        if(req.user.rol == 'admin'){
+            var type = req.params['type'];
+            var filter = req.params['filter'];
+            if(type != 'name' && type != 'email'){
+                var customers = await Customer.find();
+                res.status(200).send({data: customers});
+            }else {
+                if(type == 'name'){
+                    let regx = await Customer.find({name: new RegExp(filter, 'i')});
+                    res.status(200).send({data: regx});
+                }else if (type == 'email'){
+                    let regx = await Customer.find({email: new RegExp(filter, 'i')});
+                    res.status(200).send({data: regx});
+                }
+            }
+        }else {
+            res.status(400).send({message: "You don't have permissions to perform this action"});
         }
-    }   
+    }else {
+        res.status(400).send({message: "You don't have permissions to perform this action"});
+    }
 }
 
+const createCustomerByAdmin = async (req, res) => {
+    if(req.user){
+        if(req.user.rol == 'admin'){
+            var params = req.body;
+            let regx = await Customer.find({email: new RegExp(params.email, 'i')});
+            if(regx.length == 0){
+                if(params.password){
+                    try {
+                        const hash = await new Promise((resolve, reject) => {
+                            bcrypt.hash(params.password, null, null, (err, hash) => {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    resolve(hash);
+                                }
+                            });
+                        });
+
+                        if (hash) {
+                            params.password = hash;
+                            var register = await Customer.create(params);
+                            res.status(200).send({message: register});
+                        }
+                    } catch (error) {
+                        res.status(500).send({message: "An error occurred during password hashing"});
+                    }
+                } else {
+                    res.status(400).send({message: "Register failed, password is required"});
+                }
+            }else {
+                res.status(400).send({message: "The email already exists"});
+            }
+        }else {
+            res.status(400).send({message: "You don't have permissions to perform this action"});
+        }
+    }else {
+        res.status(400).send({message: "You don't have permissions to perform this action"});
+    }
+}
+
+const getCustomerInfoById = async (req, res) => {
+    if(req.user){
+        if(req.user.rol == 'admin'){
+            var id = req.params['id'];
+            try{
+                var result = await Customer.findById(id);
+                res.status(200).send({data: result});
+            }catch (error){
+                res.status(400).send({message: "The customer doesn't exists"});
+            }
+        }else {
+            res.status(400).send({message: "You don't have permissions to perform this action"});
+        }
+    }else {
+        return res.status(400).send({message: "You don't have permissions to perform this action"});
+    }
+}
+
+const updateCustomer = async (req, res) => {
+    if(req.user){
+        if(req.user.rol == 'admin'){
+            var id = req.params['id'];
+            var params = req.body;
+
+            try{
+                var result = await Customer.findByIdAndUpdate({_id : id}, {
+                    name: params.name,
+                    email: params.email,
+                    lastname: params.lastname,
+                    phone: params.phone,
+                    idDocument: params.idDocument,
+                    gender: params.gender,
+                    birthdate: params.birthdate,
+                });
+                
+                res.status(200).send({data: result});
+            }catch (error){
+                res.status(400).send({message: "The customer doesn't exists"});
+            }
+        }else {
+            res.status(400).send({message: "You don't have permissions to perform this action"});
+        }
+    }else {
+        return res.status(400).send({message: "You don't have permissions to perform this action"});
+    }
+}
+
+const deleteCustomer = async (req, res) => {
+    if(req.user){
+        if(req.user.rol == 'admin'){
+            var id = req.params['id'];
+            try{
+                var result = await Customer.findByIdAndDelete(id);
+                res.status(200).send({data: result});
+            }catch (error){
+                res.status(400).send({message: "The customer doesn't exists"});
+            }
+        }else {
+            res.status(400).send({message: "You don't have permissions to perform this action"});
+        }
+    }else {
+        return res.status(400).send({message: "You don't have permissions to perform this action"});
+    }
+}
 
 module.exports = {
     createCustomer, 
     loginCustomer, 
-    getAllCustomers
+    getAllCustomers, 
+    createCustomerByAdmin,
+    getCustomerInfoById, 
+    updateCustomer,
+    deleteCustomer
 }

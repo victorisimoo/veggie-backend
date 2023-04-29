@@ -9,6 +9,7 @@ var port = process.env.PORT || 4201;
 
 var customer_routes = require('./routes/customer');
 var administrator_routes = require('./routes/Administrator');
+var product_routes = require('./routes/product');
 
 mongoose.connect('mongodb+srv://victorisimoo:rQxGCng2poTDBAwP@veggie-db.2h6yjgv.mongodb.net/?retryWrites=true&w=majority', {
   useNewUrlParser: true,
@@ -16,7 +17,7 @@ mongoose.connect('mongodb+srv://victorisimoo:rQxGCng2poTDBAwP@veggie-db.2h6yjgv.
 })
 .then(() => {
     app.listen(port, function() {
-        console.log("Servidor del api rest de música escuchando en http://localhost:" + port);
+        console.log("Servidor del api rest escuchando en http://localhost:" + port);
     });
 })
 .catch(error => {
@@ -37,6 +38,7 @@ app.use((req,res,next)=>{
 
 app.use('/api', customer_routes);
 app.use('/api', administrator_routes);
+app.use('/api', product_routes);
 
 module.exports = app;
 
